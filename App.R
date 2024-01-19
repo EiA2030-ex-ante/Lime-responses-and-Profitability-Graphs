@@ -49,7 +49,7 @@ ui <- shinyUI(fluidPage(
                    font_scale = 0.7, bootswatch = "litera"),
   # run bs_theme_preview() to select customize
   # Application title
-  titlePanel("Lime responses and Profitability Graphs"),
+  titlePanel("Agricultural Lime Responses and Profitability"),
   # Sidebar with the input from users
   sidebarLayout(
     sidebarPanel(
