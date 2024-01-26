@@ -59,7 +59,7 @@ ui <- shinyUI(fluidPage(
       numericInput("x_uncertainty", "Uncertainty of lime price (distance to upper/lower 95th percentile CI)", value = 0),
       numericInput("y_uncertainty", "Uncertainty of maize price (distance to upper/lower 95th percentile CI)", value = 50),
       conditionalPanel(
-        'input.out === "Predictions"',
+        'input.out === "Agronomic responses"',
         h5(""),
         HTML('This tool is designed to allow users to explore the economic profitability of agricultural liming to address soil acidity-related production constraints. The data used are for maize, collected from farms in moderately acidic areas of Ethiopia, Rwanda and Tanzania. The intention is to allow users to explore the farm-level profitability of lime applications, given an empirical yield response function, at different input and output prices. This tool is part of the analytical resources being assembled to facilitate ex ante analysis of agronomic investments. Tool development was supported by the Excellence in Agronomy (EiA) Initiative, part of the One CGIAR’s research portfolio to deliver science and innovation to transform food, land, and water systems in a climate crisis. Find more information <a href=\'https://eia.cgiar.org/\'>here</a>.'),
         h5("About the data:"),
@@ -85,14 +85,14 @@ ui <- shinyUI(fluidPage(
       conditionalPanel(
         'input.out === "MVCR"',
         h5(""),
-        HTML('The marginal value-cost ratio (MVCR) is computed as the marginal product (MP), or the unit of additional output gained per unit of additional input, multiplied by the ratio of output and input prices (P^y⁄P^x ).  MP corresponds to input use efficiency (UE), a concept often used by agronomists to define input-output relationships of interest. An MVCR value of 0 indicates the optimal input level for a risk-neutral farmer (because marginal returns are zero). However, MVCR values of 1 or greater are often used analytically as more reasonable indicators of acceptable minimum marginal returns, given risk-aversion by producers and the possibility of incompletely observed costs of production or transactions that would effectively attenuate the actual returns to an investment by a farmer in real world conditions. Typically, the way that MVCR is used is by calculating the share of a sample that has an estimated MVCR above 0 (or some other reference value, e.g., 1 or 2). See peer-reviewed examples of such analysis <a href=\'https://onlinelibrary.wiley.com/doi/10.1002/ldr.3940\'>here</a>.  and <a href=\'https://onlinelibrary.wiley.com/doi/10.1111/agec.12299 \'>here</a>.  . This graph shows the MVCR of agricultural lime applications at different levels of application.')
+        HTML('The marginal value-cost ratio (MVCR) is computed as the marginal product (MP), or the unit of additional output gained per unit of additional input, multiplied by the ratio of output and input prices (P^y⁄P^x ).  MP corresponds to input use efficiency (UE), a concept often used by agronomists to define input-output relationships of interest. An MVCR value of 0 indicates the optimal input level for a risk-neutral farmer (because marginal returns are zero). However, MVCR values of 1 or greater are often used analytically as more reasonable indicators of acceptable minimum marginal returns, given risk-aversion by producers and the possibility of incompletely observed costs of production or transactions that would effectively attenuate the actual returns to an investment by a farmer in real world conditions. Typically, the way that MVCR is used is by calculating the share of a sample that has an estimated MVCR above 0 (or some other reference value, e.g., 1 or 2). See peer-reviewed examples of such analysis <a href=\'https://onlinelibrary.wiley.com/doi/10.1002/ldr.3940\'>here</a> and <a href=\'https://onlinelibrary.wiley.com/doi/10.1111/agec.12299 \'>here</a>. This graph shows the MVCR of agricultural lime applications at different levels of application.')
       ),
       img(src = "https://s3.amazonaws.com/eventtia/event_logos/31142/medium/eialogovrgb16569197111656919711.png?1656919711", width = "20%")
     ),
     mainPanel(
       tabsetPanel(
         id = 'out',
-        tabPanel("Predictions", plotOutput("plot_predictions"), 
+        tabPanel("Agronomic responses", plotOutput("plot_predictions"), 
                  h5(""),
                  HTML('This graph shows empirical yield responses in maize (along with 95 percentile confidence intervals) as a continuous function of agricultural lime. ')
         ),
@@ -184,6 +184,7 @@ server <- function(input, output) {
 
 # Run the Shiny app
 shinyApp(ui, server)
+
 
 
 
