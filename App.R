@@ -61,7 +61,8 @@ ui <- shinyUI(fluidPage(
       conditionalPanel(
         'input.out === "Agronomic responses"',
         h5(""),
-        HTML('This tool is designed to allow users to explore the economic profitability of agricultural liming to address soil acidity-related production constraints. The data used are for maize, collected from farms in moderately acidic areas of Ethiopia, Rwanda and Tanzania. The intention is to allow users to explore the farm-level profitability of lime applications, given an empirical yield response function, at different input and output prices. This tool is part of the analytical resources being assembled to facilitate ex ante analysis of agronomic investments. Tool development was supported by the Excellence in Agronomy (EiA) Initiative, part of the One CGIAR’s research portfolio to deliver science and innovation to transform food, land, and water systems in a climate crisis. Find more information <a href=\'https://eia.cgiar.org/\'>here</a>.'),
+        HTML('This tool is designed to allow users to explore the economic profitability of agricultural liming to address soil acidity-related production constraints. The data used are for maize, collected from farms in moderately acidic areas of Ethiopia, Rwanda and Tanzania. The intention is to allow users to explore the farm-level profitability of lime applications, given an empirical yield response function, at different input and output prices. This tool is part of the analytical resources being assembled to facilitate ex ante analysis of agronomic investments. Tool development was supported by the <a href=\'https://eia.cgiar.org/\'> Excellence in Agronomy (EiA)</a> Initiative, part of the <a href=\'https://www.cgiar.org/food-security-impact/one-cgiar/\'>One CGIAR’s</a> research portfolio to deliver science and innovation to transform food, land, and water systems in a climate crisis. Find more information <a href=\'https://eia.cgiar.org/\'>here</a>. The code used in the assembly of this this tool is avilable at this <a href=\'https://github.com/EiA2030-ex-ante/Lime-responses-and-Profitability-Graphs/blob/main/App.R\'>Github repository</a>'),
+        h5(""),
         h5("About the data:"),
         HTML("The data used in this tool were collected in 2020 from on-farm trials in Ethiopia, Rwanda and Tanzania as part of the Guiding Acid Soil Management Investments in Africa <a href='https://www.cimmyt.org/projects/gaia/'>(GAIA)</a> project, led by CIMMYT and funded by the Bill and Melinda Gates Foundation. "),
         h5(""),
@@ -71,11 +72,6 @@ ui <- shinyUI(fluidPage(
         'input.out === "Marginal Effects"',
         h5(""),
         HTML('This graph shows the marginal effects of agricultural lime applications (i.e., the additional maize produced for each additional unit of lime applied) at different levels of application.')
-      ),
-      conditionalPanel(
-        'input.out === "Net Revenue"',
-        h5(""),
-        HTML('This graph shows the expected net revenue returns to lime investments at different application levels. Net revenue is calculated as R = (y * P^y )-(x * P^x ) where y is output, x is the input being evaluated (holding other inputs constant), and P^yand P^x are the prices of outputs and inputs, respectively.')
       ),
       conditionalPanel(
         'input.out === "AVCR"',
@@ -92,12 +88,17 @@ ui <- shinyUI(fluidPage(
     mainPanel(
       tabsetPanel(
         id = 'out',
-        tabPanel("Agronomic responses", plotOutput("plot_predictions"), 
+        tabPanel("Agronomic responses", 
+                 plotOutput("plot_predictions"), 
                  h5(""),
-                 HTML('This graph shows empirical yield responses in maize (along with 95 percentile confidence intervals) as a continuous function of agricultural lime. ')
+                 HTML('<strong>Estimated yield (MT/HA):</strong> This graph shows empirical yield responses in maize (along with 95 percentile confidence intervals) as a continuous function of agricultural lime. '),
+                 h5(""),
+                 plotOutput("plot_net_rev"),
+                 h5(""),
+                 HTML('<strong>Net Revenue:</strong> This graph shows the expected net revenue returns to lime investments at different application levels. Net revenue is calculated as R = (y * P^y )-(x * P^x ) where y is output, x is the input being evaluated (holding other inputs constant), and P^y and P^x are the prices of outputs and inputs, respectively.')
         ),
+        
         tabPanel("Marginal Effects", plotOutput("plot_marginal_effects")),
-        tabPanel("Net Revenue", plotOutput("plot_net_rev")),
         tabPanel("AVCR", plotOutput("plot_avcr")),
         tabPanel("MVCR", plotOutput("plot_mvcr")),
         verbatimTextOutput("hover_text")
@@ -121,17 +122,6 @@ server <- function(input, output) {
       theme(legend.position = "bottom", legend.text = element_text(size = 16), legend.title = element_blank())
   })
   
-  output$plot_marginal_effects <- renderPlot({
-    ggplot(marginal_effects, aes(x = lime_tha, y = yhat)) +
-      geom_point() +
-      geom_line(aes(x = lime_tha, y = yhat, color = "Marginal Effects"), linewidth = 1) +
-      labs(title = "Marginal Effects", x = "Lime application (MT/HA)", y = "Estimated yield (MT/HA)") +
-      theme(axis.title.x = element_text(size = 16),
-            axis.title.y = element_text(size = 16)) +
-      scale_color_manual(values = "red") +
-      theme(legend.position = "bottom", legend.text = element_text(size = 16), legend.title = element_blank())
-  })
-  
   output$plot_net_rev <- renderPlot({
     lower_bound_net_rev <- (predictions$yhat * (input$p_y - input$y_uncertainty)) + (predictions$lime_tha * (input$p_x - input$x_uncertainty))
     upper_bound_net_rev <- (predictions$yhat * (input$p_y + input$y_uncertainty)) + (predictions$lime_tha * (input$p_x + input$x_uncertainty))
@@ -145,6 +135,17 @@ server <- function(input, output) {
       theme(axis.title.x = element_text(size = 16),
             axis.title.y = element_text(size = 16)) +
       scale_color_manual(values = c("red", "blue", "green")) +
+      theme(legend.position = "bottom", legend.text = element_text(size = 16), legend.title = element_blank())
+  })
+  
+  output$plot_marginal_effects <- renderPlot({
+    ggplot(marginal_effects, aes(x = lime_tha, y = yhat)) +
+      geom_point() +
+      geom_line(aes(x = lime_tha, y = yhat, color = "Marginal Effects"), linewidth = 1) +
+      labs(title = "Marginal Effects", x = "Lime application (MT/HA)", y = "Estimated yield (MT/HA)") +
+      theme(axis.title.x = element_text(size = 16),
+            axis.title.y = element_text(size = 16)) +
+      scale_color_manual(values = "red") +
       theme(legend.position = "bottom", legend.text = element_text(size = 16), legend.title = element_blank())
   })
   
